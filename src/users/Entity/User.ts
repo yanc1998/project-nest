@@ -2,7 +2,7 @@
 import { BaseEntity } from "src/base/Entity/baseEntity";
 import { prop } from "@typegoose/typegoose";
 
-export class User extends BaseEntity<string>{
+export class User extends BaseEntity{
     @prop({required:true})
     username: string;
     @prop({required:true})

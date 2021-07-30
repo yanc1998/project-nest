@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { UserDto } from "../DTO/UserDto";
 import { User } from "../Entity/User";
 import { UserService } from "../Service/UserService";
 
@@ -16,7 +17,12 @@ export class UserController {
         return await this.UserService.GetMany(filter);
     }
     @Post('/add')
-    async Add(@Body('user') user: User): Promise<User> {
+    async Add(@Body('user') user: UserDto): Promise<User> {
         return await this.UserService.Add(user);
+    }
+    @Post('/delete')
+    async delete(): Promise<User[]> {
+        return await this.UserService.DeleteMany({});
+
     }
 }

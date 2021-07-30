@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PaginateIn } from '../DTO/INPUT/PaginateIn';
 import { PaginateOut } from '../DTO/OUTPUT/PaginateOut';
 import { IRepository } from '../Interfaces/IRepository';
@@ -8,7 +8,7 @@ import { AnyParamConstructor } from '@typegoose/typegoose/lib/types';
 
 
 @Injectable()
-export class BaseRepository<T extends BaseEntity<string>> implements IRepository<T>{
+export class BaseRepository<T extends BaseEntity> implements IRepository<T>{
 
     private readonly model: ReturnModelType<AnyParamConstructor<T>>;
 
@@ -17,6 +17,9 @@ export class BaseRepository<T extends BaseEntity<string>> implements IRepository
     }
     async getbyId(id: string): Promise<T> {
         return await this.model.findById(id);
+    }
+    async getByfitler(filter: {}): Promise<T> {
+        return await this.model.findOne(filter);
     }
     async getMany(filter: {}): Promise<T[]> {
         return await this.model.find(filter);

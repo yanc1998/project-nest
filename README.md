@@ -28,6 +28,15 @@
 
 ## Installation
 
+sudo service mongodb stop
+
+
+```bash
+$ sudo docker build -t nestjs/project .
+  sudo docker compose up
+```
+
+
 ```bash
 $ npm install
 ```

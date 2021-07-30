@@ -1,5 +1,5 @@
 
-export class BaseEntity<T>{
-    public _id: T;
+export class BaseEntity {
+    _id?: string
     public date: Date
 }
