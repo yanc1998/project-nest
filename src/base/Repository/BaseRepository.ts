@@ -15,6 +15,16 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T>{
     constructor(_model: ReturnModelType<AnyParamConstructor<T>>) {
         this.model = _model
     }
+    async UpdateProp(filter: {}, prop: {}): Promise<T> {
+        return await this.model.findOneAndUpdate(filter, prop)
+    }
+    async updateByModel(model: T): Promise<T> {
+        let filter: {} = { _id: model._id };
+        let update: {} = { ...model };
+        return await this.model.findOneAndUpdate(filter, update);
+    }
+
+
     async getbyId(id: string): Promise<T> {
         return await this.model.findById(id);
     }

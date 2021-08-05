@@ -1,12 +1,19 @@
 
-import { BaseEntity } from "src/base/Entity/baseEntity";
+import { BaseEntity } from "../../base/Entity/baseEntity";
 import { prop } from "@typegoose/typegoose";
 
-export class User extends BaseEntity{
-    @prop({required:true})
+export enum UserRole {
+    ADMIN = 'admin',
+    USER = 'user',
+    MANAGER='manager'
+}
+export class User extends BaseEntity {
+    @prop({ required: true })
     username: string;
-    @prop({required:true})
+    @prop({ required: true })
     email: string;
-    @prop({required:true})
+    @prop({ required: true })
     password: string;
+    @prop()
+    role: UserRole
 }

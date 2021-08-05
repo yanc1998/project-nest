@@ -1,8 +1,10 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy, ExtractJwt } from 'passport-jwt'
-import { Constants } from "src/base/constants/constants";
-import { UserService } from "src/users/Service/UserService";
+import { AppError } from "src/base/errors/app.error";
+import { User } from "src/users/Entity/User";
+import { Constants } from "../../base/constants/constants";
+import { UserService } from "../../users/Service/UserService";
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private readonly userService: UserService) {
@@ -12,14 +14,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             secretOrKey: Constants.jwt_scret,
         });
     }
-    async validate(payload: any) {
+    async validate(payload: any): Promise<User> {
 
-        const user = await this.userService.GetByFilter({ email: payload.email });
+        const result = await this.userService.GetByFilter({ filter: { email: payload.email } });
 
-        if (!user) {
-            throw new UnauthorizedException()
+        if (!result.isOk) {
+            throw new UnauthorizedException('not permits');
 
         }
-        return user;
+        return result.getData();
     }
 }
