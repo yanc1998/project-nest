@@ -54,6 +54,13 @@ export class ResultGenericDto<R, E extends IResultError = IResultError> {
         return ResultGenericDto.OK();
     }
 
+    public mapAsync<T>(func: (a: R) => T): ResultGenericDto<T> {
+        return this.isOk
+            ? ResultGenericDto.OK(func(this.data))
+            : ResultGenericDto.Fail(this.error);
+    }
+
+
     public static AddResult<U>(res: any, result: ResultGenericDto<U>): U | IResultError {
         if (result.isOk) {
             console.log('1')

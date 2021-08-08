@@ -1,5 +1,9 @@
+import { prop } from "@typegoose/typegoose"
 
 export class BaseEntity {
     _id?: string
-    public date: Date
+
+    @prop({ default: new Date() })
+    date: Date
+
 }

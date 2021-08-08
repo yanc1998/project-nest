@@ -5,7 +5,7 @@ import { prop } from "@typegoose/typegoose";
 export enum UserRole {
     ADMIN = 'admin',
     USER = 'user',
-    MANAGER='manager'
+    MANAGER = 'manager'
 }
 export class User extends BaseEntity {
     @prop({ required: true })
@@ -15,5 +15,8 @@ export class User extends BaseEntity {
     @prop({ required: true })
     password: string;
     @prop()
-    role: UserRole
+    role: UserRole;
+
+    @prop({ default: false })
+    is_register_confirm: boolean;
 }

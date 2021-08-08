@@ -2,8 +2,11 @@ import { Body, Controller, Get, Post, Req, Request, Res, UseGuards, UsePipes, Va
 import { ResultGenericDto } from 'src/base/DTO/OUTPUT/ResultGenericDto';
 import { AppError } from 'src/base/errors/app.error';
 import { IResultError } from 'src/base/Interfaces/IResultError';
+import { ForgetPasswordDto } from 'src/users/DTO/ForgetPassword';
+import { UserReturn } from 'src/users/DTO/UserReturn';
 import { UserDtoRegister } from '../../users/DTO/UserDtoRegister';
 import { User } from '../../users/Entity/User';
+import { ConfirmRegisterDto } from '../DTO/ConfirmRegisterDto';
 import { ReturnLoginDTo } from '../DTO/ReturnLoginDto';
 import { JwtAuthGuard } from '../Guards/jwtAuthGuards';
 import { LocalAuthGuard } from '../Guards/LocalAuthGuard';
@@ -18,7 +21,8 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get('/profile')
     async GetProfile(@Request() req) {
-        return req.user
+        return UserReturn.UserToUserReturn(req.user)
+
     }
 
     @UseGuards(LocalAuthGuard)
@@ -32,9 +36,20 @@ export class AuthController {
 
 
     @Post('/register')
-    async register(@Body() user: UserDtoRegister): Promise<ResultGenericDto<User> | AppError.UnexpectedErrorResult<User> | AppError.ValidationErrorResult<User>> {
+    async register(@Body() user: UserDtoRegister): Promise<ResultGenericDto<UserReturn> | AppError.UnexpectedErrorResult<UserReturn> | AppError.ValidationErrorResult<UserReturn>> {
         let result: ResultGenericDto<User> | AppError.UnexpectedErrorResult<User> | AppError.ValidationErrorResult<User> = await this.authService.Register(user);
-        return result;
+        return result.mapAsync(UserReturn.UserToUserReturn)
 
+    }
+
+    @Post('/confirmRegister')
+    async confirmRegister(@Body() confirmRegisterdto: ConfirmRegisterDto) {
+        return await this.authService.ConfirmRegister(confirmRegisterdto)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('/forgot_password')
+    async forgot_password(@Body() forget_password: ForgetPasswordDto, @Request() req: any): Promise<ResultGenericDto<any> | IResultError> {
+        return await this.authService.forgerPassword(forget_password, req.user)
     }
 }

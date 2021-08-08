@@ -11,55 +11,122 @@ import { File } from "../Entity/File";
 import { FileRepository } from "../Repository/FileRepository";
 import { unlinkSync } from 'fs'
 import { Constants } from "src/base/constants/constants";
+import { ResultGenericDto } from "src/base/DTO/OUTPUT/ResultGenericDto";
+import { AppError } from "src/base/errors/app.error";
 
 @Injectable()
 export class FileService {
     constructor(private readonly fileRepository: FileRepository) {
     }
 
-    async GetById(getfile: GetFileDto): Promise<File> {
-        return await this.fileRepository.getbyId(getfile.id);
-    }
-    async GetByFilter(getfilter: GetFileFilterDto): Promise<File> {
-        return await this.fileRepository.getByfitler(getfilter.filter);
-    }
-    async GetMany(getfilter: GetFileFilterDto): Promise<File[]> {
-        return await this.fileRepository.getMany(getfilter.filter);
-    }
+    async GetById(getfile: GetFileDto): Promise<ResultGenericDto<File> | AppError.UnexpectedErrorResult<File>> {
+        try {
 
-    async Add(file: FileDto): Promise<File> {
-        let _file: File = {
-            url: file.url,
-            date: new Date()
+            let file: File = await this.fileRepository.getbyId(getfile.id);
+            return ResultGenericDto.OK(file);
+
+        } catch (error) {
+
+            return ResultGenericDto.Fail(new AppError.UnexpectedError(error));
         }
-        return await this.fileRepository.add(_file);
+    }
+    async GetByFilter(getfilter: GetFileFilterDto): Promise<ResultGenericDto<File> | AppError.UnexpectedErrorResult<File>> {
+
+        try {
+
+            let file: File = await this.fileRepository.getByfitler(getfilter.filter);
+            return ResultGenericDto.OK(file);
+
+        } catch (error) {
+
+            return ResultGenericDto.Fail(new AppError.UnexpectedError(error));
+        }
+
+    }
+    async GetMany(getfilter: GetFileFilterDto): Promise<ResultGenericDto<File[]> | AppError.UnexpectedErrorResult<File[]>> {
+        try {
+
+            let files: File[] = await this.fileRepository.getMany(getfilter.filter);
+            return ResultGenericDto.OK(files);
+
+        } catch (error) {
+
+            return ResultGenericDto.Fail(new AppError.UnexpectedError(error));
+        }
+
     }
 
-    async DeleteById(deleteFile: DeleteFileDto): Promise<File> {
-        return await this.fileRepository.deleteById(deleteFile.id);
-    }
-    async DeleteMany(deleteMany: DeleteFileFilterDto): Promise<any> {
-        return await this.fileRepository.deleteMany(deleteMany.filter);
+    async Add(file: FileDto): Promise<ResultGenericDto<File> | AppError.UnexpectedErrorResult<File>> {
+        try {
+
+            let filetoAdd: File = {
+                url: file.url,
+                date: new Date()
+            }
+
+            let newfile: File = await this.fileRepository.add(filetoAdd);
+            return ResultGenericDto.OK(newfile);
+
+        } catch (error) {
+
+            return ResultGenericDto.Fail(new AppError.UnexpectedError(error));
+        }
+
     }
 
-    async Paginate(paginate: PaginateIn): Promise<PaginateOut<File>> {
-        return await this.fileRepository.paginate(paginate);
+    async DeleteById(deleteFile: DeleteFileDto): Promise<ResultGenericDto<File> | AppError.UnexpectedErrorResult<File>> {
+        try {
+
+            let file: File = await this.fileRepository.deleteById(deleteFile.id);
+            return ResultGenericDto.OK(file);
+
+        } catch (error) {
+
+            return ResultGenericDto.Fail(new AppError.UnexpectedError(error));
+        }
+
+    }
+    async DeleteMany(deleteMany: DeleteFileFilterDto): Promise<ResultGenericDto<any> | AppError.UnexpectedErrorResult<any>> {
+        try {
+
+            let file: File = await this.fileRepository.deleteMany(deleteMany.filter);
+            return ResultGenericDto.OK(file);
+
+        } catch (error) {
+
+            return ResultGenericDto.Fail(new AppError.UnexpectedError(error));
+        }
     }
 
-    async Update(updateFile: UpdateFileDto): Promise<File> {
-        let file: File = await this.fileRepository.getbyId(updateFile.id);
-        if (file) {
+    async Paginate(paginate: PaginateIn): Promise<PaginateOut<ResultGenericDto<PaginateOut<File>>> | AppError.UnexpectedErrorResult<PaginateOut<File>>> {
+        try {
+
+            let paginateresult: PaginateOut<File> = await this.fileRepository.paginate(paginate);
+            return ResultGenericDto.OK(paginateresult);
+
+        } catch (error) {
+
+            return ResultGenericDto.Fail(new AppError.UnexpectedError(error));
+        }
+
+    }
+
+    async Update(updateFile: UpdateFileDto): Promise<ResultGenericDto<File> | AppError.UnexpectedErrorResult<File>> {
+        try {
+            let file: File = await this.fileRepository.getbyId(updateFile.id);
+
             //borrar la foto de la carpeta ./public
-            try {
-                unlinkSync(Constants.BASE_PATH_FILE + file.url)
-            }
-            catch (error) {
-                //retornar el error
-            }
-            return await this.fileRepository.UpdateProp({ _id: updateFile.id }, updateFile.dato);
+            unlinkSync(Constants.BASE_PATH_FILE + file.url)
 
+            let newfile = await this.fileRepository.UpdateProp({ _id: updateFile.id }, updateFile.dato);
+
+            return ResultGenericDto.OK(newfile);
+
+        } catch (error) {
+
+            return ResultGenericDto.Fail(new AppError.UnexpectedError(error));
         }
-        //retornar el error cuando ponga la clase error_file
+
     }
 
 }

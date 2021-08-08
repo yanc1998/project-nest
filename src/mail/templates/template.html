@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <meta>
+</head>
+<div id="response"></div>
+<input type="button" class="btn btn-primary" value="Update Password" onclick="javascript:sendRequest();" />
+
+<body>
+
+</body>
+<script>
+    function sendRequest() {
+        var req = new XMLHttpRequest();
+        req.open("POST", 'http://url.com', false);
+        req.setRequestHeader("Authorization", `Berer token`);
+        req.send();
+        alert(req.status);
+        response.innerHTML = req.responseText;
+    }
+</script>
+
+</html>
