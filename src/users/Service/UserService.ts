@@ -120,7 +120,7 @@ export class UserService {
         try {
 
             let filter = { email: email }
-            let prop = { is_register_confirm: true };
+            let prop = { is_register_confirm: confirm };
             await this.UserRepository.UpdateProp(filter, prop);
             return ResultGenericDto.OK()
 
@@ -135,7 +135,7 @@ export class UserService {
 
             if (user) {
 
-                if (compare(user.password, updateUserPasswordDto.old_password)) {
+                if (compareSync(updateUserPasswordDto.old_password, user.password)) {
 
                     let filter = { _id: id }
                     let prop_to_update = { password: hashSync(updateUserPasswordDto.new_password, Constants.ROUNDS_BYCRIPT) }
@@ -151,10 +151,10 @@ export class UserService {
             return ResultGenericDto.Fail(new AppError.UnexpectedError(error));
         }
     }
-    async updateForgetPassword(updateForgetPassword: ForgetPasswordDto, user: User) {
+    async updateForgetPassword(updateForgetPassword: ForgetPasswordDto) {
         try {
 
-            let filter = { _id: user._id }
+            let filter = { email: updateForgetPassword.email }
             let prop_to_update = { password: hashSync(updateForgetPassword.newpassword, Constants.ROUNDS_BYCRIPT) }
             await this.UserRepository.UpdateProp(filter, prop_to_update);
             return ResultGenericDto.OK();

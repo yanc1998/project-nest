@@ -15,6 +15,7 @@ import { IResultError } from "src/base/Interfaces/IResultError";
 import { ConfirmRegisterDto } from "../DTO/ConfirmRegisterDto";
 import { jwt_config_confirm_register } from "../config/auth.config";
 import { MailError } from "src/mail/errors/email.errors";
+import { ConfirmForgetPassword } from "../DTO/ConfirmForgetPassword";
 @Injectable()
 export class AuthService {
     constructor(private readonly userService: UserService, private readonly jwtService: JwtService, private readonly mailService: MailService) {
@@ -40,47 +41,76 @@ export class AuthService {
 
     }
 
-    async forgerPassword(forgetPassword: ForgetPasswordDto, user: User): Promise<ResultGenericDto<any> | IResultError> {
-        const payload = { email: user.email, sub: user._id, from_email: true, newpassword: forgetPassword.newpassword };
-        let acces_token = await this.jwtService.signAsync(payload);
-        let route = `${Constants.url_front}/Auth/forgot_password/${acces_token}`
-        let html = ""
+    async forgerPassword(forgetPassword: ForgetPasswordDto): Promise<ResultGenericDto<any> | IResultError> {
 
-        let result = await this.mailService.SendEmail(user.email, html);
-        return result;
+        let result_user = await this.userService.GetByFilter({ filter: { email: forgetPassword.email } })
+
+        if (result_user.isOk) {
+
+            let user = result_user.getData();
+
+            if (user) {
+
+                let payload = { email: user.email, sub: user._id, from_email: true, newpassword: forgetPassword.newpassword };
+                let acces_token = await this.jwtService.signAsync(payload, jwt_config_confirm_register);
+                let route = `${Constants.url_front}/Auth/forgot_password/${acces_token}`
+                let html = `<b>${route}<b/>`
+                return await this.mailService.SendEmail(user.email, html);
+            }
+            return ResultGenericDto.Fail(new AppError.ValidationError('not exist user with this email'))
+        }
+
+        return ResultGenericDto.Fail(result_user.error);
+    }
+
+    //completar
+    async ConfirmForgetPassword(confirmForgetPassword: ConfirmForgetPassword) {
+        if (await this.jwtService.verifyAsync(confirmForgetPassword.validationCode, jwt_config_confirm_register)) {
+            let pyload: any = this.jwtService.decode(confirmForgetPassword.validationCode)
+            return await this.userService.updateForgetPassword({ newpassword: pyload.newpassword, email: pyload.email })
+
+        }
+        return ResultGenericDto.Fail(new AppError.ValidationError('invalid confirm register token'))
     }
 
     async Register(user: UserDtoRegister): Promise<ResultGenericDto<User> | AppError.ValidationErrorResult<User> | MailError.EmailSendErrorResult<any>> {
 
         const result: ResultGenericDto<User> | AppError.UnexpectedErrorResult<User> = await this.userService.GetByFilter({ filter: { email: user.email } });
+
         if (result.isOk) {
+
             let new_data: User = result.getData();
-            let pyload = { email: user.email, confirm_register: true }
-            let register_token = await this.jwtService.signAsync(pyload, jwt_config_confirm_register)
+            let payload = { email: user.email, confirm_register: true }
+            let register_token = await this.jwtService.signAsync(payload, jwt_config_confirm_register)
             let data = `<b>${register_token}<b/>`
 
             if (!new_data) {
 
                 let emailresult = await this.mailService.SendEmail(user.email, data);
+
                 if (emailresult.isOk) {
+
                     return await this.userService.Add(UserDto.RegisterToDto(user, UserRole.USER));
                 }
+
                 return ResultGenericDto.Fail(emailresult.error);
 
             } else {
-                console.log(new_data)
+
                 if (!new_data.is_register_confirm) {
-                    let res_pass = compareSync(user.password, new_data.password)
-                    console.log(res_pass)
-                    if (res_pass) {
+
+                    if (compareSync(user.password, new_data.password)) {
                         let res_mail = await this.mailService.SendEmail(user.email, data);
                         if (res_mail.isOk) {
                             return ResultGenericDto.OK(new_data)
                         }
+
                         return ResultGenericDto.Fail(res_mail.error)
                     }
+
                     return ResultGenericDto.Fail(new AppError.ValidationError('user alredy exist with other password witout confirm'))
                 }
+
                 return ResultGenericDto.Fail(new AppError.ValidationError('user alredy exist'))
             }
 

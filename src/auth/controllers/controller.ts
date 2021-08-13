@@ -6,6 +6,7 @@ import { ForgetPasswordDto } from 'src/users/DTO/ForgetPassword';
 import { UserReturn } from 'src/users/DTO/UserReturn';
 import { UserDtoRegister } from '../../users/DTO/UserDtoRegister';
 import { User } from '../../users/Entity/User';
+import { ConfirmForgetPassword } from '../DTO/ConfirmForgetPassword';
 import { ConfirmRegisterDto } from '../DTO/ConfirmRegisterDto';
 import { ReturnLoginDTo } from '../DTO/ReturnLoginDto';
 import { JwtAuthGuard } from '../Guards/jwtAuthGuards';
@@ -47,9 +48,14 @@ export class AuthController {
         return await this.authService.ConfirmRegister(confirmRegisterdto)
     }
 
-    @UseGuards(JwtAuthGuard)
+
     @Post('/forgot_password')
-    async forgot_password(@Body() forget_password: ForgetPasswordDto, @Request() req: any): Promise<ResultGenericDto<any> | IResultError> {
-        return await this.authService.forgerPassword(forget_password, req.user)
+    async forgot_password(@Body() forget_password: ForgetPasswordDto): Promise<ResultGenericDto<any> | IResultError> {
+        return await this.authService.forgerPassword(forget_password)
+    }
+
+    @Post('/confirmForgetPassword')
+    async ConfirmForgetPassword(@Body() confirmforgetpassword: ConfirmForgetPassword): Promise<ResultGenericDto<any> | IResultError> {
+        return await this.authService.ConfirmForgetPassword(confirmforgetpassword)
     }
 }

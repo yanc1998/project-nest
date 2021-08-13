@@ -95,10 +95,6 @@ export class UserController {
         return await this.UserService.UpdatePassword(userUpdatePasswordDto, req.user._id);
     }
 
-    @Post('updateForgetPassword')
-    async updateForgetPassword(@Body() updateforgetPassword: ForgetPasswordDto) {
-
-    }
 
     @Roles('manager')
     @UseGuards(RolesGuard)
@@ -126,10 +122,5 @@ export class UserController {
         }
         result.getError()
     }
-    @UseGuards(JwtAuthGuard)
-    @Post('/forgot_password')
-    async test() {
-        console.log("okkk")
-        return "okkkkkkk"
-    }
+
 }
