@@ -121,8 +121,8 @@ export class UserService {
 
             let filter = { email: email }
             let prop = { is_register_confirm: confirm };
-            await this.UserRepository.UpdateProp(filter, prop);
-            return ResultGenericDto.OK()
+            const user = await this.UserRepository.UpdateProp(filter, prop);
+            return ResultGenericDto.OK(user)
 
         } catch (error) {
 

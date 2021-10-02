@@ -11,8 +11,8 @@ import { MailService } from './service/MailService';
                     host:"smtp.gmail.com",
                     secure:true,
                     auth:{
-                        user:"yancarloglez98@gmail.com",
-                        pass:"yancarlo@gmail"
+                        user:"onlineshoptest2021@gmail.com",
+                        pass:"onlineShop@gmail"
                     }
                 },
                 defaults: {

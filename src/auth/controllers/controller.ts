@@ -31,7 +31,7 @@ export class AuthController {
     async Login(@Request() req): Promise<ResultGenericDto<ReturnLoginDTo> | AppError.ValidationErrorResult<ReturnLoginDTo>> {
         let result: ResultGenericDto<ReturnLoginDTo> | AppError.ValidationErrorResult<ReturnLoginDTo> = await this.authService.login(req.user);
         console.log('login')
-
+        console.log(result)
         return result
     }
 
@@ -39,13 +39,16 @@ export class AuthController {
     @Post('/register')
     async register(@Body() user: UserDtoRegister): Promise<ResultGenericDto<UserReturn> | AppError.UnexpectedErrorResult<UserReturn> | AppError.ValidationErrorResult<UserReturn>> {
         let result: ResultGenericDto<User> | AppError.UnexpectedErrorResult<User> | AppError.ValidationErrorResult<User> = await this.authService.Register(user);
+        console.log(result)
         return result.mapAsync(UserReturn.UserToUserReturn)
+
 
     }
 
     @Post('/confirmRegister')
     async confirmRegister(@Body() confirmRegisterdto: ConfirmRegisterDto) {
-        return await this.authService.ConfirmRegister(confirmRegisterdto)
+        let result = await this.authService.ConfirmRegister(confirmRegisterdto)
+        return result.mapAsync(UserReturn.UserToUserReturn)
     }
 
 

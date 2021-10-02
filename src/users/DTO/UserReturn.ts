@@ -12,13 +12,16 @@ export class UserReturn {
 
     date: Date
 
+    is_register_confirm: boolean
+
     public static UserToUserReturn(user: User): UserReturn {
         return {
             _id: user._id,
             username: user.username,
             email: user.email,
             role: user.role,
-            date: user.date
+            date: user.date,
+            is_register_confirm: user.is_register_confirm
         } as UserReturn
     }
 

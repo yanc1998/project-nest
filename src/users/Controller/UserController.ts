@@ -96,11 +96,12 @@ export class UserController {
     }
 
 
-    @Roles('manager')
-    @UseGuards(RolesGuard)
+    //@Roles('manager')
+    //@UseGuards(RolesGuard)
     @UseGuards(JwtAuthGuard)
-    @Get('/paginate')
+    @Post('/paginate')
     async paginate(@Body() paginate: PaginateIn): Promise<ResultGenericDto<PaginateOut<UserReturn>> | AppError.UnexpectedErrorResult<PaginateOut<UserReturn>>> {
+        console.log(paginate)
         let paginate_Out = await this.UserService.Paginate(paginate);
         return paginate_Out.mapAsync(UserReturn.PaginateUserResult);
     }

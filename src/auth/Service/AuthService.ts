@@ -65,12 +65,16 @@ export class AuthService {
 
     //completar
     async ConfirmForgetPassword(confirmForgetPassword: ConfirmForgetPassword) {
-        if (await this.jwtService.verifyAsync(confirmForgetPassword.validationCode, jwt_config_confirm_register)) {
-            let pyload: any = this.jwtService.decode(confirmForgetPassword.validationCode)
-            return await this.userService.updateForgetPassword({ newpassword: pyload.newpassword, email: pyload.email })
+        try {
+            if (await this.jwtService.verifyAsync(confirmForgetPassword.validationCode, jwt_config_confirm_register)) {
+                let pyload: any = this.jwtService.decode(confirmForgetPassword.validationCode)
+                return await this.userService.updateForgetPassword({ newpassword: pyload.newpassword, email: pyload.email })
 
+            }
+            return ResultGenericDto.Fail(new AppError.ValidationError('invalid confirm register token'))
+        } catch (error) {
+            return ResultGenericDto.Fail(new AppError.ValidationError(error))
         }
-        return ResultGenericDto.Fail(new AppError.ValidationError('invalid confirm register token'))
     }
 
     async Register(user: UserDtoRegister): Promise<ResultGenericDto<User> | AppError.ValidationErrorResult<User> | MailError.EmailSendErrorResult<any>> {
@@ -120,12 +124,16 @@ export class AuthService {
     }
 
     async ConfirmRegister(confirmRegister: ConfirmRegisterDto) {
-        if (await this.jwtService.verifyAsync(confirmRegister.validationCode, jwt_config_confirm_register)) {
-            let pyload: any = this.jwtService.decode(confirmRegister.validationCode)
-            return await this.userService.UpdateConfirmRegister(pyload.email, true);
+        try {
+            if (await this.jwtService.verifyAsync(confirmRegister.validationCode, jwt_config_confirm_register)) {
+                let pyload: any = this.jwtService.decode(confirmRegister.validationCode)
+                return await this.userService.UpdateConfirmRegister(pyload.email, true);
 
+            }
+
+        } catch (error) {
+            return ResultGenericDto.Fail(new AppError.ValidationError(error))
         }
-        return ResultGenericDto.Fail(new AppError.ValidationError('invalid confirm register token'))
     }
 
     async SendVerificationCode(email: string) {

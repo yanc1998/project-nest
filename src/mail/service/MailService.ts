@@ -14,7 +14,7 @@ export class MailService {
             return ResultGenericDto.OK()
         }
         catch (error) {
-            console.log(error)
+            
             return ResultGenericDto.Fail(new MailError.EmailSendError('error to send email, try egain'))
         }
     }
